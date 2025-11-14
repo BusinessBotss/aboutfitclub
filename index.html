@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitClub Mallorca - Premium Slide Deck</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100%;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            min-height: 100%;
+        }
+
+        .slide-wrapper {
+            position: relative;
+            width: 100%;
+            height: auto;
+            min-height: 80%;
+            overflow: hidden;
+        }
+
+        .slide {
+            background: linear-gradient(145deg, rgba(25, 25, 25, 0.95), rgba(15, 15, 15, 0.98));
+            border: 2px solid #19C5C5;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.6),
+                0 0 20px rgba(25, 197, 197, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0;
+            transform: translateX(30px);
+            pointer-events: none;
+        }
+
+        .slide.active {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+            z-index: 3;
+        }
+
+        .slide.prev {
+            transform: translateX(-30px);
+            opacity: 0;
+        }
+
+        .slide.next {
+            transform: translateX(30px);
+            opacity: 0;
+        }
+
+        .slide.hero {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide.hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(25, 197, 197, 0.1) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .nav-button {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(25, 197, 197, 0.9), rgba(22, 180, 180, 0.9));
+            border: 2px solid #19C5C5;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 10px 20px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(25, 197, 197, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 
+                0 15px 30px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(25, 197, 197, 0.5);
+            background: linear-gradient(135deg, #19C5C5, #22d4d4);
+        }
+
+        .nav-button:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .nav-prev {
+            left: 30px;
+        }
+
+        .nav-next {
+            right: 30px;
+        }
+
+        .slide-nav-dots {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(25, 197, 197, 0.3);
+            backdrop-filter: blur(10px);
+            max-width: 90vw;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .slide-nav-dots::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .nav-dot.active {
+            background: #19C5C5;
+            box-shadow: 0 0 10px rgba(25, 197, 197, 0.5);
+            transform: scale(1.2);
+        }
+
+        .nav-dot:hover {
+            background: rgba(25, 197, 197, 0.7);
+            transform: scale(1.1);
+        }
+
+        .slide-image {
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 24px;
+            box-shadow: 
+                0 15px 30px rgba(0, 0, 0, 0.5),
+                0 0 15px rgba(25, 197, 197, 0.3);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(25, 197, 197, 0.3);
+        }
+
+        .slide-image:hover {
+            transform: scale(1.03);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.7),
+                0 0 25px rgba(25, 197, 197, 0.5);
+        }
+
+        .slide-image.landscape {
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+
+        .slide-image.portrait {
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            max-width: 400px;
+            margin: 0 auto 24px auto;
+            display: block;
+        }
+
+        .slide-video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 15px;
+            margin-bottom: 24px;
+            box-shadow: 
+                0 15px 30px rgba(0, 0, 0, 0.5),
+                0 0 15px rgba(25, 197, 197, 0.3);
+            border: 1px solid rgba(25, 197, 197, 0.3);
+        }
+
+        .slide-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            text-shadow: 0 0 20px rgba(25, 197, 197, 0.5);
+            line-height: 1.2;
+        }
+
+        .slide-subtitle {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #19C5C5;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+
+        .slide-content {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .slide-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .slide-list li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            color: #e0e0e0;
+        }
+
+        .slide-list li::before {
+            content: '●';
+            color: #19C5C5;
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .image-grid img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid rgba(25, 197, 197, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .image-grid img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(25, 197, 197, 0.3);
+        }
+
+        .celebrity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .celebrity-grid img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 15px;
+            border: 2px solid rgba(25, 197, 197, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .celebrity-grid img:hover {
+            transform: scale(1.08);
+            box-shadow: 0 15px 30px rgba(25, 197, 197, 0.4);
+            border-color: #19C5C5;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .cta-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .cta-link {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #19C5C5, #16b3b3);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(25, 197, 197, 0.3);
+        }
+
+        .cta-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(25, 197, 197, 0.5);
+            background: linear-gradient(135deg, #22d4d4, #19C5C5);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .pricing-item {
+            background: rgba(25, 197, 197, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(25, 197, 197, 0.3);
+            text-align: center;
+        }
+
+        .pricing-item h4 {
+            color: #19C5C5;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .slide {
+                padding: 25px;
+            }
+            
+            .slide-title {
+                font-size: 2rem;
+            }
+            
+            .slide-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .slide-content {
+                font-size: 1rem;
+            }
+            
+            .image-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .celebrity-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .nav-button {
+                width: 50px;
+                height: 50px;
+            }
+
+            .nav-prev {
+                left: 15px;
+            }
+
+            .nav-next {
+                right: 15px;
+            }
+
+            .slide-nav-dots {
+                top: 15px;
+                padding: 8px 15px;
+            }
+
+            .nav-dot {
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        /* Touch swipe indicators */
+        .slide-wrapper.swiping {
+            cursor: grabbing;
+        }
+
+        .slide-wrapper.swipe-left .slide.active {
+            transform: translateX(-10px);
+        }
+
+        .slide-wrapper.swipe-right .slide.active {
+            transform: translateX(10px);
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container"><!-- Navigation Buttons --> <button class="nav-button nav-prev" id="prevBtn" aria-label="Previous slide">
+    <svg width="24" height="24" viewbox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg></button> <button class="nav-button nav-next" id="nextBtn" aria-label="Next slide">
+    <svg width="24" height="24" viewbox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg></button> <!-- Slide Navigation Dots -->
+   <div class="slide-nav-dots" id="slideNavDots"></div><!-- Slide Wrapper -->
+   <div class="slide-wrapper" id="slideWrapper"><!-- Slide 1: Hero Cover -->
+    <div class="slide hero active" data-slide="0"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148979/13_q3qkn8.png" alt="FitClub Mallorca Entrance" class="slide-image landscape">
+     <h1 class="slide-title" id="main-title">FIT CLUB MALLORCA</h1>
+     <h2 class="slide-subtitle" id="subtitle">Your Premier Fitness Destination in Palmanova</h2>
+     <div class="slide-content">
+      <p>Welcome to Fit Club Mallorca — a modern boutique gym crafted for individuals who value performance, style, and premium training environments. Located above Mercadona in Son Caliu (Palmanova), our club blends advanced equipment, elegant design, and a community-driven atmosphere.</p>
+      <p>Whether you are a resident seeking long-term progress or a visitor wanting to stay active during your holiday, Fit Club Mallorca provides everything you need to elevate your fitness journey.</p>
+     </div>
+    </div><!-- Slide 2: About Us -->
+    <div class="slide" data-slide="1">
+     <video class="slide-video" autoplay muted loop><source src="https://res.cloudinary.com/ddjl4shzl/video/upload/v1763149642/SnapInsta.to_AQMCgSlsA8xMLu8kJTLKbsZj2-f2alHN3cYxjKg00h8joWpb6iKZt9wcOdbd1Ow64Eg5oNdhfyGEtd5iZI2LRyPxZ-Jn4fq1L4trc6c_z81ywr.mp4" type="video/mp4">
+     </video>
+     <h2 class="slide-title">More Than a Gym — A Complete Fitness &amp; Lifestyle Experience</h2>
+     <div class="slide-content">
+      <p>Fit Club Mallorca stands as one of the island's most dynamic fitness centres. Every corner of our facility has been purposefully designed to provide a professional, uplifting and effective training experience.</p>
+      <p><strong>We offer:</strong></p>
+      <ul class="slide-list">
+       <li>State-of-the-art strength &amp; cardio equipment</li>
+       <li>A fully equipped functional training room</li>
+       <li>Combat and athletic training areas</li>
+       <li>A dedicated Recovery Room with premium therapies</li>
+       <li>Expert-led group classes for all levels</li>
+      </ul>
+      <p>Whether you're a complete beginner or a seasoned athlete, our team ensures your training remains safe, structured, and results-driven.</p>
+     </div>
+    </div><!-- Slide 3: Entrance -->
+    <div class="slide" data-slide="2"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148979/15_gdvfu5.png" alt="FitClub Entrance" class="slide-image landscape">
+     <h2 class="slide-title">Welcome to Your Fitness Home in Mallorca</h2>
+     <div class="slide-content">
+      <p>Our inviting entrance leads you to an elevated training experience — modern, energizing, and designed for both comfort and performance. The moment you step through our doors, you become part of a community committed to progress.</p>
+     </div>
+    </div><!-- Slide 4: Cardio Area -->
+    <div class="slide" data-slide="3"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148980/16_pccvyk.png" alt="Cardio Area" class="slide-image landscape">
+     <h2 class="slide-title">High-Performance Cardio Zone</h2>
+     <div class="slide-content">
+      <p>Experience the latest-generation cardio equipment, ideal for warm-ups, endurance sessions, fat-burning goals, and performance conditioning. Machines are intuitive, sleek, and designed for smooth motion and maximum comfort.</p>
+      <p>Perfect for beginners, intermediates, and high-level athletes.</p>
+     </div>
+    </div><!-- Slide 5: Strength Room -->
+    <div class="slide" data-slide="4"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148980/17_uhafyq.png" alt="Strength Room" class="slide-image landscape">
+     <h2 class="slide-title">Strength Begins Here</h2>
+     <div class="slide-content">
+      <p>Our strength room is equipped with premium machines, free weights, resistance stations, and guided equipment suitable for every style of training.</p>
+      <p><strong>What you'll find:</strong></p>
+      <ul class="slide-list">
+       <li>Professional-grade weight machines</li>
+       <li>Extensive free-weight section</li>
+       <li>Benches, racks &amp; multi-purpose stations</li>
+       <li>Beginner-friendly guided machines</li>
+       <li>Advanced setups for hypertrophy &amp; power</li>
+      </ul>
+      <p>Whether you're starting your fitness journey or pushing for elite performance, we provide the tools to succeed.</p>
+     </div>
+    </div><!-- Slide 6: Functional Training Room -->
+    <div class="slide" data-slide="5"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148980/18_nwka82.png" alt="Functional Training Room" class="slide-image landscape">
+     <h2 class="slide-title">Functional Training — Redefined</h2>
+     <div class="slide-content">
+      <p>Our dedicated Functional Training Room supports everything from foundational movements to advanced athletic performance. It is the beating heart of our group classes and the ideal space for strength, stability, and conditioning work.</p>
+      <p><strong>Equipment includes:</strong></p>
+      <ul class="slide-list">
+       <li>Free weights</li>
+       <li>Racks &amp; benches</li>
+       <li>Resistance bands</li>
+       <li>TRX systems</li>
+       <li>Pull-up bars</li>
+       <li>Core &amp; mobility equipment</li>
+      </ul>
+      <p>Group classes run Monday–Saturday, making this the most vibrant and active zone of the gym.</p>
+     </div>
+    </div><!-- Slide 7: Booty Corner -->
+    <div class="slide" data-slide="6"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148980/19_hdtxkv.png" alt="Booty Corner" class="slide-image landscape">
+     <h2 class="slide-title">The Booty Corner — Precision Lower Body Training</h2>
+     <div class="slide-content">
+      <p>A specialised zone engineered to activate, sculpt, and strengthen glutes and legs with targeted machines. This area is one of our most popular spots, offering controlled, effective movements for visible lower-body improvements.</p>
+     </div>
+    </div><!-- Slide 8: Recovery Zone -->
+    <div class="slide" data-slide="7"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148983/22_neezqx.png" alt="Recovery Zone Entry" class="slide-image landscape">
+     <h2 class="slide-title">Your Sanctuary for Regeneration</h2>
+     <div class="slide-content">
+      <p>Our Recovery Room is designed for complete post-training optimisation. Step inside to experience a calm, modern space dedicated to healing, performance, and longevity.</p>
+     </div>
+    </div><!-- Slide 9: Ice Bath & Massage -->
+    <div class="slide" data-slide="8"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148983/23_gkwl0h.png" alt="Ice Bath &amp; Massage" class="slide-image landscape">
+     <h2 class="slide-title">Ice Bath &amp; Massage Therapy</h2>
+     <div class="slide-content">
+      <p><strong>Ice Bath Benefits:</strong></p>
+      <ul class="slide-list">
+       <li>Reduces inflammation and soreness</li>
+       <li>Accelerates tissue recovery</li>
+       <li>Enhances mental resilience</li>
+       <li>Boosts athletic performance</li>
+      </ul>
+      <p>Our massage area provides deep-tissue work to release tension, improve mobility, and promote full-body relaxation.</p>
+     </div>
+    </div><!-- Slide 10: Therabody -->
+    <div class="slide" data-slide="9"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148982/21_we4xxx.png" alt="Therabody Station" class="slide-image landscape">
+     <h2 class="slide-title">Therabody Percussion Therapy</h2>
+     <div class="slide-content">
+      <p>Using advanced technology, our Therabody station reduces muscular tension, speeds recovery, and improves flexibility. Perfect after intense training sessions or combat sports.</p>
+     </div>
+    </div><!-- Slide 11: Shake Bar -->
+    <div class="slide" data-slide="10"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148983/24_ovah30.png" alt="Shake Bar" class="slide-image landscape">
+     <h2 class="slide-title">Fuel Your Body. Upgrade Your Performance.</h2>
+     <div class="slide-content">
+      <p>Our Shake Bar offers protein shakes, supplement options, and FitClub merchandise. Everything you need to fuel recovery or grab essential gear before training.</p>
+     </div>
+    </div><!-- Slide 12: Group Classes -->
+    <div class="slide" data-slide="11">
+     <div class="image-grid"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148985/28_dibuhp.png" alt="High-intensity functional training class in progress"> <img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148985/27_lk4beg.png" alt="Boxing class with instructor guidance"> <img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148984/26_qhddda.png" alt="Group strength training session"> <img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763148984/25_adn1bo.png" alt="HIIT conditioning class workout">
+     </div>
+     <h2 class="slide-title">Group Classes for Every Goal</h2>
+     <div class="slide-content">
+      <p>Our weekly class timetable includes high-energy sessions that combine strength, conditioning, mobility and athletic performance.</p>
+      <p><strong>Featured classes:</strong></p>
+      <ul class="slide-list">
+       <li>Functional Fit</li>
+       <li>Boxing</li>
+       <li>Abs &amp; Stretch</li>
+       <li>FIT45</li>
+       <li>Legs &amp; Booty Gains</li>
+       <li>Sexy Upper Body</li>
+       <li>HIIT Black &amp; White</li>
+       <li>GAP Class</li>
+       <li>Total Body Conditioning</li>
+      </ul>
+      <p>Every class is instructor-led, beginner-friendly, and optimised for results.</p>
+     </div>
+    </div><!-- Slide 13: Community & Notable Visitors -->
+    <div class="slide" data-slide="12">
+     <div class="celebrity-grid"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763144861/IMG_0267_lwdovl.jpg" alt="International athlete training at FitClub Mallorca"> <img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763144860/IMG_0265_hiwml3.jpg" alt="Celebrity guest enjoying premium fitness facilities"> <img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763144860/IMG_0266_wh3clk.jpg" alt="Public figure participating in group training session"> <img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763144860/IMG_0264_bk4iz7.jpg" alt="Notable member of FitClub Mallorca community">
+     </div>
+     <h2 class="slide-title">A Global Fitness Hub</h2>
+     <div class="slide-content">
+      <p>Fit Club Mallorca attracts a diverse international community, including athletes, entrepreneurs, creators, and public figures. Our environment promotes excellence, discipline, and personal transformation — a space where everyone feels inspired to train.</p>
+     </div>
+    </div><!-- Slide 14: Trainers -->
+    <div class="slide" data-slide="13">
+     <h2 class="slide-title">Your Coaches. Your Transformation.</h2>
+     <div class="slide-content">
+      <p>Our Personal Trainers bring decades of combined experience across strength, conditioning, combat sports, body transformation, and holistic wellness.</p>
+      <p><strong>Each PT offers:</strong></p>
+      <ul class="slide-list">
+       <li>Tailored 1:1 coaching</li>
+       <li>Personalised training programmes</li>
+       <li>Technique refinement</li>
+       <li>Lifestyle &amp; nutrition advice</li>
+       <li>Goal-focused progress tracking</li>
+      </ul>
+      <p>We help beginners build confidence and athletes reach peak performance.</p>
+     </div>
+    </div><!-- Slide 15: Personal Training -->
+    <div class="slide" data-slide="14">
+     <h2 class="slide-title">Achieve More with Personal Training</h2>
+     <div class="slide-content">
+      <p>1:1 sessions designed to accelerate your progress with expert guidance and complete customisation.</p>
+      <div class="pricing-grid">
+       <div class="pricing-item">
+        <h4>1 PT Session</h4>
+        <p>€100</p>
+       </div>
+       <div class="pricing-item">
+        <h4>10 PT Pack</h4>
+        <p>€750 <small>(save €250)</small></p>
+       </div>
+      </div>
+      <p><strong>Ideal for:</strong></p>
+      <ul class="slide-list">
+       <li>Beginners learning technique</li>
+       <li>Athletes seeking advanced conditioning</li>
+       <li>Women wanting body-toning &amp; wellness</li>
+       <li>Tourists needing short-term guidance</li>
+       <li>Individuals with specific goals or limitations</li>
+      </ul>
+      <p>Sessions available across the main gym, functional room, or combat areas.</p>
+     </div>
+    </div><!-- Slide 16: Physiotherapy & Massage -->
+    <div class="slide" data-slide="15">
+     <h2 class="slide-title">Professional Physiotherapy &amp; Deep Tissue Massage</h2>
+     <div class="slide-content">
+      <p>Our therapy services support injury prevention, pain management, and long-term physical well-being.</p>
+      <p><strong>Physiotherapy includes:</strong></p>
+      <ul class="slide-list">
+       <li>Manual therapy</li>
+       <li>Mobility restoration</li>
+       <li>Electrotherapy</li>
+       <li>Postural correction</li>
+       <li>Rehab for injuries &amp; chronic pain</li>
+      </ul>
+      <p><strong>Deep Tissue Massage:</strong></p>
+      <ul class="slide-list">
+       <li>Relieves chronic muscle tension</li>
+       <li>Improves mobility</li>
+       <li>Enhances circulation</li>
+       <li>Ideal after intense training</li>
+      </ul>
+      <p>Available for athletes, everyday members, tourists, and recovery-focused clients.</p>
+     </div>
+    </div><!-- Slide 17: Memberships -->
+    <div class="slide" data-slide="16">
+     <h2 class="slide-title">Flexible Access for Residents &amp; Visitors</h2>
+     <div class="slide-content">
+      <div class="pricing-grid">
+       <div class="pricing-item">
+        <h4>Memberships</h4>
+        <ul class="slide-list">
+         <li>1 Month</li>
+         <li>3 Months</li>
+         <li>6 Months</li>
+         <li>1 Year</li>
+        </ul>
+       </div>
+       <div class="pricing-item">
+        <h4>Visitor Passes</h4>
+        <ul class="slide-list">
+         <li>1 Day</li>
+         <li>1 Week</li>
+         <li>2 Weeks</li>
+         <li>Flexi Pass (10 entries)</li>
+        </ul>
+       </div>
+      </div>
+      <p>All passes activate within 30 days of purchase. Time-based passes run consecutively; Flexi Pass does not.</p>
+     </div>
+    </div><!-- Slide 18: Combat Sports -->
+    <div class="slide" data-slide="17">
+     <h2 class="slide-title">Train Like a Fighter — MMA &amp; Brazilian Jiu Jitsu</h2>
+     <div class="slide-content">
+      <p>Our Combat Programmes include MMA and BJJ for adults, teens and kids, led by IMMAF-certified instructor Dan Robson.</p>
+      <p><strong>Highlights:</strong></p>
+      <ul class="slide-list">
+       <li>Technical striking &amp; grappling</li>
+       <li>Self-defence</li>
+       <li>Strength &amp; conditioning</li>
+       <li>Safe progressions for all levels</li>
+       <li>Belt progression (BJJ)</li>
+       <li>Opportunities for competition</li>
+      </ul>
+      <p>Perfect for residents and tourists seeking structured, high-quality martial arts training.</p>
+     </div>
+    </div><!-- Slide 19: CTA -->
+    <div class="slide" data-slide="18"><img src="https://res.cloudinary.com/ddjl4shzl/image/upload/v1763149749/1_g2qaan.png" alt="FitClub Mallorca Logo" class="slide-image landscape">
+     <div class="cta-section">
+      <h2 class="slide-title">Join Fit Club Mallorca Today</h2>
+      <p class="slide-subtitle">Your transformation starts now.</p>
+      <div class="cta-links"><a href="https://fitclubmallorca.com/my-account/" target="_blank" rel="noopener noreferrer" class="cta-link">My Account</a> <a href="https://wa.me/34690753294" target="_blank" rel="noopener noreferrer" class="cta-link">WhatsApp</a> <a href="mailto:info@fitclubmallorca.com" class="cta-link">Email Us</a>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+        // Slide Navigation System
+        class SlideNavigator {
+            constructor() {
+                this.currentSlide = 0;
+                this.slides = document.querySelectorAll('.slide');
+                this.totalSlides = this.slides.length;
+                this.slideWrapper = document.getElementById('slideWrapper');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.dotsContainer = document.getElementById('slideNavDots');
+                this.isTransitioning = false;
+                
+                this.init();
+            }
+
+            init() {
+                this.createDots();
+                this.bindEvents();
+                this.updateSlide(0, false);
+                this.setupTouchNavigation();
+            }
+
+            createDots() {
+                for (let i = 0; i < this.totalSlides; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot';
+                    dot.setAttribute('data-slide', i);
+                    dot.addEventListener('click', () => this.goToSlide(i));
+                    this.dotsContainer.appendChild(dot);
+                }
+            }
+
+            bindEvents() {
+                this.prevBtn.addEventListener('click', () => this.previousSlide());
+                this.nextBtn.addEventListener('click', () => this.nextSlide());
+                
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        this.nextSlide();
+                    } else if (e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        this.previousSlide();
+                    }
+                });
+            }
+
+            setupTouchNavigation() {
+                let startX = 0;
+                let startY = 0;
+                let endX = 0;
+                let endY = 0;
+                const minSwipeDistance = 50;
+
+                this.slideWrapper.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 1) {
+                        startX = e.touches[0].clientX;
+                        startY = e.touches[0].clientY;
+                        this.slideWrapper.classList.add('swiping');
+                    }
+                }, { passive: true });
+
+                this.slideWrapper.addEventListener('touchmove', (e) => {
+                    if (!startX) return;
+                    
+                    endX = e.touches[0].clientX;
+                    endY = e.touches[0].clientY;
+                    
+                    const deltaX = startX - endX;
+                    const deltaY = startY - endY;
+                    
+                    // Only handle horizontal swipes
+                    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                        if (deltaX > 10) {
+                            this.slideWrapper.classList.add('swipe-left');
+                            this.slideWrapper.classList.remove('swipe-right');
+                        } else if (deltaX < -10) {
+                            this.slideWrapper.classList.add('swipe-right');
+                            this.slideWrapper.classList.remove('swipe-left');
+                        }
+                    }
+                }, { passive: true });
+
+                this.slideWrapper.addEventListener('touchend', (e) => {
+                    if (!startX) return;
+                    
+                    const deltaX = startX - endX;
+                    const deltaY = startY - endY;
+                    
+                    // Only handle horizontal swipes
+                    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+                        if (deltaX > 0) {
+                            this.nextSlide();
+                        } else {
+                            this.previousSlide();
+                        }
+                    }
+                    
+                    // Reset
+                    startX = 0;
+                    startY = 0;
+                    endX = 0;
+                    endY = 0;
+                    this.slideWrapper.classList.remove('swiping', 'swipe-left', 'swipe-right');
+                }, { passive: true });
+            }
+
+            nextSlide() {
+                if (this.isTransitioning) return;
+                const nextIndex = (this.currentSlide + 1) % this.totalSlides;
+                this.updateSlide(nextIndex, true);
+            }
+
+            previousSlide() {
+                if (this.isTransitioning) return;
+                const prevIndex = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
+                this.updateSlide(prevIndex, true);
+            }
+
+            goToSlide(index) {
+                if (this.isTransitioning || index === this.currentSlide) return;
+                this.updateSlide(index, true);
+            }
+
+            updateSlide(newIndex, animate = true) {
+                if (animate) {
+                    this.isTransitioning = true;
+                }
+
+                const currentSlideEl = this.slides[this.currentSlide];
+                const newSlideEl = this.slides[newIndex];
+
+                // Update classes
+                this.slides.forEach((slide, index) => {
+                    slide.classList.remove('active', 'prev', 'next');
+                    if (index === newIndex) {
+                        slide.classList.add('active');
+                    } else if (index < newIndex) {
+                        slide.classList.add('prev');
+                    } else {
+                        slide.classList.add('next');
+                    }
+                });
+
+                // Update dots
+                const dots = this.dotsContainer.querySelectorAll('.nav-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === newIndex);
+                });
+
+                this.currentSlide = newIndex;
+
+                // Scroll to top of slide
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // Reset transition lock after animation
+                if (animate) {
+                    setTimeout(() => {
+                        this.isTransitioning = false;
+                    }, 600);
+                }
+
+                // Handle video autoplay for slide 2
+                if (newIndex === 1) {
+                    const video = newSlideEl.querySelector('video');
+                    if (video) {
+                        video.play().catch(() => {
+                            // Autoplay failed, which is normal in some browsers
+                        });
+                    }
+                }
+            }
+        }
+
+        // Element SDK Configuration
+        const defaultConfig = {
+            main_title: "FIT CLUB MALLORCA",
+            subtitle: "Your Premier Fitness Destination in Palmanova"
+        };
+
+        async function onConfigChange(config) {
+            const titleElement = document.getElementById('main-title');
+            const subtitleElement = document.getElementById('subtitle');
+            
+            if (titleElement) {
+                titleElement.textContent = config.main_title || defaultConfig.main_title;
+            }
+            if (subtitleElement) {
+                subtitleElement.textContent = config.subtitle || defaultConfig.subtitle;
+            }
+        }
+
+        function mapToCapabilities(config) {
+            return {
+                recolorables: [],
+                borderables: [],
+                fontEditable: undefined,
+                fontSizeable: undefined
+            };
+        }
+
+        function mapToEditPanelValues(config) {
+            return new Map([
+                ["main_title", config.main_title || defaultConfig.main_title],
+                ["subtitle", config.subtitle || defaultConfig.subtitle]
+            ]);
+        }
+
+        // Initialize everything when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize slide navigator
+            window.slideNavigator = new SlideNavigator();
+
+            // Initialize Element SDK
+            if (window.elementSdk) {
+                window.elementSdk.init({
+                    defaultConfig,
+                    onConfigChange,
+                    mapToCapabilities,
+                    mapToEditPanelValues
+                });
+            }
+
+            // Add loading states for images
+            document.querySelectorAll('img').forEach(img => {
+                img.addEventListener('load', function() {
+                    this.style.opacity = '1';
+                });
+                
+                img.addEventListener('error', function() {
+                    this.style.display = 'none';
+                    console.log('Image failed to load:', this.src);
+                });
+            });
+        });
+    </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99e957f3513dc902',t:'MTc2MzE1MzAzMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
